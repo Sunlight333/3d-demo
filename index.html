@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2f3b2f" />
+  <title>Pérgola Dinamo — Veja no seu ambiente</title>
+  <meta name="description" content="Visualize a Pérgola Dinamo em 3D e veja como ela fica no seu espaço com realidade aumentada." />
+
+  <!-- Load the GLB sooner: hint the browser to start fetching the model early. -->
+  <link rel="preload" href="public/pergola-dinamo.glb" as="fetch" crossorigin />
+
+  <!-- model-viewer, version-pinned (do not use @latest in production). -->
+  <script type="module"
+    src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+
+  <!-- 1. Brand header -->
+  <header class="site-header">
+    <span class="brand">Joana Coberturas</span>
+  </header>
+
+  <main>
+    <!-- 2. Hero: the 3D model fills most of the screen -->
+    <section class="hero">
+      <model-viewer
+        id="viewer"
+        src="public/pergola-dinamo.glb"
+        ios-src="public/pergola-dinamo.usdz"
+        poster="public/pergola-poster.jpg"
+        alt="Pérgola Dinamo — estrutura de metal escuro com cobertura retrátil de tecido sobre um deck de madeira"
+        camera-controls
+        touch-action="pan-y"
+        auto-rotate
+        auto-rotate-delay="2000"
+        rotation-per-second="18deg"
+        interaction-prompt="auto"
+        shadow-intensity="1"
+        exposure="1"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        ar-scale="fixed"
+        loading="eager"
+        reveal="auto">
+
+        <!-- Custom progress bar (replaces model-viewer's default) -->
+        <div class="progress-bar" slot="progress-bar" hidden>
+          <div class="progress-track"><div class="progress-fill"></div></div>
+          <p class="progress-label">Carregando a Pérgola Dinamo…</p>
+        </div>
+
+        <!-- model-viewer renders the AR button into this slot on supported devices;
+             we drive AR from our own button below, so hide the default one. -->
+        <button type="button" slot="ar-button" class="mv-ar-button-hidden" aria-hidden="true"></button>
+      </model-viewer>
+
+      <!-- "?" help icon — always available, re-opens the instructions modal -->
+      <button type="button" id="help-btn" class="help-btn" aria-label="Como usar">?</button>
+    </section>
+
+    <!-- Product photo gallery (real reference photos) -->
+    <section class="gallery" aria-label="Fotos da Pérgola Dinamo">
+      <figure class="gallery-item">
+        <img src="public/pergola-01.jpg" width="900" height="502" loading="lazy"
+             alt="Pérgola Dinamo instalada sobre deck de madeira, vista do conjunto" />
+      </figure>
+      <figure class="gallery-item">
+        <img src="public/pergola-02.jpg" width="900" height="491" loading="lazy"
+             alt="Vista sob a Pérgola Dinamo, com cobertura retrátil aberta sobre a área de estar" />
+      </figure>
+    </section>
+
+    <!-- 3. Product info card -->
+    <section class="info-card">
+      <h1 class="product-name">Pérgola Dinamo</h1>
+      <dl class="specs">
+        <div><dt>Dimensões</dt><dd>4,0 × 3,0 × 2,6 m</dd></div>
+        <div><dt>Estrutura</dt><dd>Alumínio com pintura grafite</dd></div>
+        <div><dt>Cobertura</dt><dd>Tecido retrátil acrílico</dd></div>
+      </dl>
+      <p class="product-desc">
+        Cobertura retrátil para áreas externas. Sombra sob demanda, acabamento
+        sofisticado e estrutura resistente para o seu deck ou jardim.
+      </p>
+
+      <!-- Phase 4: variant switching. Hidden until JS confirms the model
+           supports it (authored variants or named materials). -->
+      <div id="variant-panel" class="variant-panel" hidden>
+        <div class="variant-group">
+          <span class="variant-title">Madeira</span>
+          <div id="frames-row" class="swatch-row"></div>
+        </div>
+        <div class="variant-group">
+          <span class="variant-title">Tecido</span>
+          <div id="fabrics-row" class="swatch-row"></div>
+        </div>
+        <p class="variant-note">As cores aparecem na visualização 3D. No AR do iPhone, a cor é a selecionada antes de abrir.</p>
+      </div>
+
+      <!-- 4. Primary action -->
+      <p class="cam-note">
+        Vamos pedir acesso à câmera para mostrar a pérgola no seu espaço.
+      </p>
+      <button type="button" id="ar-btn" class="ar-btn">Ver no meu ambiente</button>
+
+      <!-- AR not supported message (shown by JS when applicable) -->
+      <p id="ar-unsupported" class="ar-unsupported" hidden>
+        Seu dispositivo não suporta AR no navegador. Funciona em iPhone (iOS 12+)
+        e Android com ARCore. Você ainda pode girar o modelo em 3D acima.
+      </p>
+    </section>
+  </main>
+
+  <!-- 5. Footer -->
+  <footer class="site-footer">
+    <button type="button" id="help-link" class="text-link">Como usar</button>
+    <span class="footer-sep">·</span>
+    <span class="footer-brand">Joana Coberturas</span>
+  </footer>
+
+  <!-- Instructions modal (hidden by default; opened by JS) -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title">Como usar</h2>
+      <ol class="steps">
+        <li>
+          <svg viewBox="0 0 24 24" class="step-icon" aria-hidden="true">
+            <path d="M4 8h3l2-2h6l2 2h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="12" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+          <span>Permita o acesso à câmera quando solicitado</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" class="step-icon" aria-hidden="true">
+            <path d="M3 19h18M6 19l4-9 4 5 4-8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+          <span>Aponte para o chão onde quer instalar a pérgola</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" class="step-icon" aria-hidden="true">
+            <path d="M12 3v6M12 21v-3M9 12a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
+          </svg>
+          <span>Toque na tela para posicionar</span>
+        </li>
+      </ol>
+      <button type="button" id="modal-ok" class="ar-btn">Entendi, começar</button>
+      <button type="button" id="modal-dismiss" class="text-link">Não mostrar novamente</button>
+    </div>
+  </div>
+
+  <!-- Generic error toast (shown by JS) -->
+  <div id="error-box" class="error-box" hidden>
+    <p id="error-text"></p>
+    <button type="button" id="error-retry" class="ar-btn ar-btn--small" hidden>Tentar novamente</button>
+    <button type="button" id="error-close" class="text-link">Fechar</button>
+  </div>
+
+  <script src="src/app.js"></script>
+  <script src="src/variants.js"></script>
+</body>
+</html>
