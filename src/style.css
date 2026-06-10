@@ -263,6 +263,7 @@ model-viewer {
   color: var(--text-muted);
   text-align: center;
 }
+.ar-unsupported a { color: var(--accent); }
 
 .text-link {
   background: none;
